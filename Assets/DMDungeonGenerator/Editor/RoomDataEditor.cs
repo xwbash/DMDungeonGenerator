@@ -96,7 +96,9 @@ public class RoomDataEditor : Editor
     {
         RoomData data = (RoomData)target;
 
-        foreach (var v in vox)
+        var voxCopy = vox.ToList();
+
+        foreach (var v in voxCopy)
         {
             Vector3 pos = v.position;
 
@@ -119,6 +121,7 @@ public class RoomDataEditor : Editor
             DrawArrowButton(pos, Vector3.right, 0.4f, iO, iS);
         }
     }
+
 
     private void DrawDoorEditingHandles(List<Voxel> vox)
     {
