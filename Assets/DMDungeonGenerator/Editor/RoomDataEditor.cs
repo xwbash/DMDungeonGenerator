@@ -91,10 +91,27 @@ public class RoomDataEditor : Editor
             }
 
             case EditingMode.Doors:
-                DrawDoorEditingHandles(vox);
+            {
+                var targetVoxel = GetClosestVoxel(data); 
+                if (targetVoxel != null)
+                    DrawDoorEditingHandlesForSingleVoxel(targetVoxel);
                 break;
+            }
+
         }
     }
+    
+    private void DrawDoorEditingHandlesForSingleVoxel(Voxel v)
+    {
+        Vector3 pos = v.position;
+
+        Handles.color = Color.cyan;
+        DrawDoorButtonArrow(pos, Vector3.forward, 0.4f, 0f, 1f);
+        DrawDoorButtonArrow(pos, Vector3.back, 0.4f, 0f, 1f);
+        DrawDoorButtonArrow(pos, Vector3.left, 0.4f, 0f, 1f);
+        DrawDoorButtonArrow(pos, Vector3.right, 0.4f, 0f, 1f);
+    }
+
     
     private void DrawVoxelEditingHandlesForSingleVoxel(Voxel v)
     {
