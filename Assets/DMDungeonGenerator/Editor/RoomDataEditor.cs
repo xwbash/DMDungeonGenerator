@@ -83,14 +83,42 @@ public class RoomDataEditor : Editor
         switch (mode)
         {
             case EditingMode.Voxels:
-                DrawVoxelEditingHandles(vox);
+            {
+                var targetVoxel = GetClosestVoxel(data);
+                if (targetVoxel != null)
+                    DrawVoxelEditingHandlesForSingleVoxel(targetVoxel);
                 break;
+            }
 
             case EditingMode.Doors:
                 DrawDoorEditingHandles(vox);
                 break;
         }
     }
+    
+    private void DrawVoxelEditingHandlesForSingleVoxel(Voxel v)
+    {
+        Vector3 pos = v.position;
+
+        invert = Event.current.shift;
+        doEntireRow = Event.current.control;
+
+        float iS = invert ? -1f : 1f;
+        float iO = invert ? 0.5f : 0f;
+
+        Handles.color = doEntireRow ? new Color(0.3f, 0.3f, 1f) : Color.blue;
+        DrawArrowButton(pos, Vector3.forward, 0.4f, iO, iS);
+        DrawArrowButton(pos, Vector3.back, 0.4f, iO, iS);
+
+        Handles.color = doEntireRow ? new Color(0.3f, 1f, 0.3f) : Color.green;
+        DrawArrowButton(pos, Vector3.up, 0.4f, iO, iS);
+        DrawArrowButton(pos, Vector3.down, 0.4f, iO, iS);
+
+        Handles.color = doEntireRow ? new Color(1f, 0.3f, 0.3f) : Color.red;
+        DrawArrowButton(pos, Vector3.left, 0.4f, iO, iS);
+        DrawArrowButton(pos, Vector3.right, 0.4f, iO, iS);
+    }
+
 
     private void DrawVoxelEditingHandles(List<Voxel> vox)
     {
@@ -222,6 +250,30 @@ public class RoomDataEditor : Editor
         }
 
         EditorUtility.SetDirty(target);
+    }
+
+    Voxel GetClosestVoxel(RoomData data)
+    {
+        float minDist = float.MaxValue;
+        Voxel closest = null;
+
+        Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+
+        foreach (var v in data.LocalVoxels)
+        {
+            float dist = HandleUtility.DistanceToCircle(
+                data.transform.TransformPoint(v.position * DungeonGenerator.voxelScale), 
+                0.1f
+            );
+
+            if (dist < minDist)
+            {
+                minDist = dist;
+                closest = v;
+            }
+        }
+
+        return closest;
     }
 
     private void ClickedArrowHandleDoor(Vector3 pos, Vector3 dir)
